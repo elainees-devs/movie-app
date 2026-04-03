@@ -6,7 +6,8 @@ CREATE TABLE users (
   password_hash VARCHAR(255) NOT NULL,
   name VARCHAR(100),
   created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
+  updated_at TIMESTAMP DEFAULT NOW(),
+  role_id INTEGER REFERENCES roles(id) DEFAULT 1
 );
 
 CREATE TABLE movies (
@@ -38,3 +39,30 @@ CREATE TABLE favorites (
   created_at TIMESTAMP DEFAULT NOW(),
   UNIQUE(user_id, movie_id)
 );
+
+-- User roles table
+CREATE TABLE roles (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(50) UNIQUE NOT NULL
+);
+
+-- Indexes for performance optimization
+
+-- Users
+CREATE UNIQUE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_role_id ON users(role_id);
+
+-- Movies
+CREATE INDEX idx_movies_title ON movies(title);
+CREATE INDEX idx_movies_release_date ON movies(release_date);
+
+-- Genres
+CREATE UNIQUE INDEX idx_genres_name ON genres(name);
+
+-- Favorites
+CREATE INDEX idx_favorites_user_id ON favorites(user_id);
+CREATE INDEX idx_favorites_movie_id ON favorites(movie_id);
+
+-- Movie Genres
+CREATE INDEX idx_movie_genres_movie_id ON movie_genres(movie_id);
+CREATE INDEX idx_movie_genres_genre_id ON movie_genres(genre_id);
