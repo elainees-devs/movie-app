@@ -1,0 +1,76 @@
+// Prisma schema for Next.js Movie App
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  users User[]
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  roleId       Int       @default(1)
+  role         Role      @relation(fields: [roleId], references: [id])
+  favorites    Favorite[]
+
+  @@index([roleId], name: "idx_users_role_id")
+}
+
+model Movie {
+  id          Int          @id @default(autoincrement())
+  title       String
+  description String?
+  releaseDate DateTime?
+  posterUrl   String?
+  rating      Float?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  genres      MovieGenre[]
+  favorites   Favorite[]
+
+  @@index([title], name: "idx_movies_title")
+  @@index([releaseDate], name: "idx_movies_release_date")
+}
+
+model Genre {
+  id         Int          @id @default(autoincrement())
+  name       String       @unique
+  movieGenres MovieGenre[]
+}
+
+model MovieGenre {
+  id      Int    @id @default(autoincrement())
+  movie   Movie  @relation(fields: [movieId], references: [id])
+  movieId Int
+  genre   Genre  @relation(fields: [genreId], references: [id])
+  genreId Int
+
+  @@index([movieId], name: "idx_movie_genres_movie_id")
+  @@index([genreId], name: "idx_movie_genres_genre_id")
+}
+
+model Favorite {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  movie     Movie    @relation(fields: [movieId], references: [id])
+  movieId   Int
+  createdAt DateTime @default(now())
+
+  @@unique([userId, movieId])
+  @@index([userId], name: "idx_favorites_user_id")
+  @@index([movieId], name: "idx_favorites_movie_id")
+}
