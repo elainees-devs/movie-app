@@ -42,70 +42,257 @@ This project is a scalable Next.js 15 movie application using the App Router. It
 
 ## Folder Structure
 
-```
 /movie-app
 │
-├── app/                        # App Router entry point (Next.js 15)
-│   ├── layout.tsx              # Root layout (shared UI, providers)
-│   ├── page.tsx                # Home page (movie listings, etc.)
-│   ├── movies/                 # Movie-related routes
-│   │   └── [id]/               # Dynamic route for movie details
-│   │       └── page.tsx        # Movie details page
-│   ├── search/                 # Search page
+├── app/                              # Next.js App Router (Frontend + API)
+│   ├── layout.tsx
+│   ├── page.tsx
+│
+│   ├── movies/
+│   │   └── [id]/
+│   │       └── page.tsx
+│
+│   ├── search/
 │   │   └── page.tsx
-│   ├── auth/                   # Authentication routes
+│
+│   ├── auth/
 │   │   ├── login/
 │   │   │   └── page.tsx
 │   │   └── register/
 │   │       └── page.tsx
-│   ├── favorites/              # User favorites page
-│   │   └── page.tsx
-│   └── globals.css             # Global styles
 │
-├── components/                 # Reusable UI components (buttons, cards, etc.)
+│   ├── favorites/
+│   │   └── page.tsx
+│
+│   ├── dashboard/
+│   │   └── page.tsx
+│
+│   ├── profile/
+│   │   └── page.tsx
+│
+│   ├── api/                          # 🔥 BACKEND (Route Handlers)
+│   │   ├── auth/
+│   │   │   ├── login/
+│   │   │   │   └── route.ts
+│   │   │   └── register/
+│   │   │       └── route.ts
+│   │   │
+│   │   ├── users/
+│   │   │   └── profile/
+│   │   │       └── route.ts
+│   │   │
+│   │   ├── movies/
+│   │   │   ├── route.ts              # GET all movies
+│   │   │   └── [id]/
+│   │   │       └── route.ts          # GET single movie
+│   │   │
+│   │   ├── genres/
+│   │   │   └── route.ts
+│   │   │
+│   │   ├── favorites/
+│   │   │   ├── route.ts              # GET, POST
+│   │   │   └── [movieId]/
+│   │   │       └── route.ts          # DELETE
+│   │   │
+│   │   └── health/
+│   │       └── route.ts              # Health check (optional)
+│
+│   └── globals.css
+│
+├── components/                       # UI components
 │   ├── MovieCard.tsx
 │   ├── Navbar.tsx
 │   └── ...
 │
-├── layouts/                    # Shared layouts (e.g., AuthLayout, MainLayout)
+├── layouts/                          # UI layouts
 │   ├── AuthLayout.tsx
 │   └── MainLayout.tsx
 │
-├── context/                    # React context/state management (e.g., Auth, Favorites)
+├── context/                          # Global state (frontend)
 │   ├── AuthContext.tsx
 │   └── FavoritesContext.tsx
 │
-├── hooks/                      # Custom React hooks
+├── hooks/                            # Custom hooks
 │   ├── useAuth.ts
 │   └── useFavorites.ts
 │
-├── lib/                        # API calls and utility functions
-│   ├── api/                    # API call helpers (fetch, axios, etc.)
+├── lib/                              # Shared logic (frontend + backend)
+│   ├── db.ts                         # 🔥 Database connection (Prisma or pg)
+│   ├── auth.ts                       # 🔥 JWT / session helpers
+│   ├── api/                          # Frontend API calls
 │   │   ├── movies.ts
 │   │   └── auth.ts
-│   └── utils/                  # General utility functions
+│   └── utils/
 │       └── formatDate.ts
 │
-├── styles/                     # Component-specific and global styles
-│   ├── MovieCard.module.css
+├── services/                         # 🔥 Business logic layer
+│   ├── auth.service.ts
+│   ├── user.service.ts
+│   ├── movie.service.ts
+│   ├── genre.service.ts
+│   └── favorite.service.ts
+│
+├── controllers/                      # 🔥 Request handlers (clean separation)
+│   ├── auth.controller.ts
+│   ├── user.controller.ts
+│   ├── movie.controller.ts
+│   ├── genre.controller.ts
+│   └── favorite.controller.ts
+│
+├── validators/                       # 🔥 Input validation (Zod/Joi)
+│   ├── auth.validator.ts
+│   ├── movie.validator.ts
+│   └── favorite.validator.ts
+│
+├── middleware/                       # 🔥 Auth & route protection
+│   └── auth.middleware.ts
+│
+├── types/                            # TypeScript types/interfaces
+│   ├── user.ts
+│   ├── movie.ts
+│   └── index.ts
+│
+├── prisma/                           # 🔥 Prisma ORM (if using Prisma)
+│   ├── schema.prisma
+│   └── migrations/
+│
+├── sql/                              # Raw SQL (your schema.sql)
+│   └── schema.sql
+│
+├── styles/
 │   └── ...
 │
-├── public/                     # Static assets (images, icons, etc.)
+├── public/
 │
-├── README.md                   # Project documentation
+├── .env                              # Environment variables
+├── README.md
 ├── package.json
 ├── tsconfig.json
-└── ...                         # Other config files
+└── ...onfig files
 ```
 
 ## Explanations
-- **app/**: Main entry for routes/pages using the App Router. Each subfolder is a route; dynamic routes use [id].
+- **app/**: Main entry for routes/pages using the App Router. Each subfolder is a route; dynamic routes use [id]. Also contains - **app/api/**: for backend route handlers.
+- **app/api/**: Backend endpoints built with Next.js Route Handlers. Handles requests for auth, movies, genres, favorites, and users.
 - **components/**: Reusable UI elements (cards, navbars, buttons).
 - **layouts/**: Shared layout components for different sections (e.g., authenticated vs. public).
 - **context/**: React context providers for global state (auth, favorites).
 - **hooks/**: Custom hooks for encapsulating logic (e.g., authentication, favorites).
+- **lib/db/**: Database connection and queries (PostgreSQL using Prisma or pg).
+- **lib/auth/**: Authentication utilities (JWT handling, password hashing, session logic).
 - **lib/api/**: Functions for making API requests (movies, auth).
 - **lib/utils/**: General utility functions (formatting, helpers).
+- **services/**: Business logic layer (e.g., movie service, favorite service, user service).
+- **controllers/**: Handles request/response logic and connects API routes to services.
+- **validators/**: Input validation schemas (e.g., Zod/Joi for request validation).
+- **middleware/**: Handles authentication, authorization, and request interception.
+- **types/**: TypeScript interfaces/types (User, Movie, Genre, Favorite, Role).
+- **prisma/**: Prisma schema and migrations for PostgreSQL database.
+- **sql/**: Raw SQL files (e.g., schema.sql) for manual database setup and structure.
 - **styles/**: CSS modules or other style files for components.
-- **public/**: Static files served as-is.
+public/: Static files served as-is.
+- **.env**: Environment variables (database URL, JWT secret, etc.).
 - **README.md**: Project overview and setup instructions.
+
+## Setting Up PostgreSQL Locally
+
+Follow these steps to create and initialize your local PostgreSQL database for the movie app:
+
+1. **Install PostgreSQL**  
+   - On Ubuntu:  
+     ```bash
+     sudo apt update
+     sudo apt install postgresql postgresql-contrib
+     ```
+   - On Mac (Homebrew):  
+     ```bash
+     brew install postgresql
+     ```
+
+2. **Start PostgreSQL Service**  
+   - On Ubuntu:  
+     ```bash
+     sudo service postgresql start
+     ```
+   - On Mac:  
+     ```bash
+     brew services start postgresql
+     ```
+
+3. **Switch to the postgres user**  
+   - On Ubuntu:  
+     ```bash
+     sudo -u postgres psql
+     ```
+   - On Mac:  
+     ```bash
+     psql postgres
+     ```
+
+4. **Create a new database and user**  
+   In the PostgreSQL prompt:
+   ```sql
+   CREATE DATABASE movieapp;
+   CREATE USER yourusername WITH PASSWORD 'yourpassword';
+   GRANT ALL PRIVILEGES ON DATABASE movieapp TO yourusername;
+   ```
+   Replace `yourusername` and `yourpassword` with your preferred credentials.
+
+5. **Exit psql**  
+   ```sql
+   \q
+   ```
+
+6. **Update your .env file**  
+   Set your DATABASE_URL in .env:
+   ```
+   DATABASE_URL=postgresql://yourusername:yourpassword@localhost:5432/movieapp
+   ```
+
+7. **Run your schema**  
+   From your project root, run:
+   ```bash
+   psql -U yourusername -d movieapp -f sql/schema.sql
+   ```
+   If you get a “role does not exist” error, use the `-U` flag with the correct username.
+
+You now have a local PostgreSQL database set up for your app!
+
+## App Folder Structure by User Role
+
+### Visitor
+```
+app/
+├── page.tsx                # Home (browse/search, read-only movie details)
+├── search/                 # Browse/Search
+│   └── page.tsx
+├── movies/
+│   └── [id]/
+│       └── page.tsx        # Movie Details (read-only)
+└── auth/
+    ├── login/
+    │   └── page.tsx        # Login
+    └── register/
+        └── page.tsx        # Sign Up
+```
+
+### Logged-in User
+```
+app/
+├── dashboard/              # Home / Dashboard
+│   ├── page.tsx
+│   ├── search/
+│   │   └── page.tsx        # Browse/Search
+│   └── movies/
+│       └── [id]/
+│           └── page.tsx    # Movie Details (add to favorites, add review)
+├── favorites/
+│   └── page.tsx            # Favorites
+├── profile/
+│   └── page.tsx            # Profile / Settings
+```
+
+- **Visitor**: Can browse/search and view movie details (read-only), and sign up or log in.
+- **Logged-in User**: Has access to dashboard, can browse/search, view movie details (with add to favorites/review), manage favorites, and update profile/settings.
+
+> Adjust routing and access control in your app to match these user flows for best UX and security.
